@@ -23,7 +23,7 @@ root.config(menu=menubar)
 # load audio file
 organise_menu = Menu(menubar, tearoff=False)
 organise_menu.add_command(label='Select Folder',command=lambda: load_music(root, songList))  # Pass the required arguments
-organise_menu.entryconfig("Select Folder", foreground="purple")
+organise_menu.entryconfig("Select Folder", foreground="purple1")
 menubar.add_cascade(label='Load Music', menu=organise_menu)
 
 #top frame for info box
