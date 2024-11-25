@@ -156,7 +156,7 @@ def clean(songList, root):
 
 
 def update_len_freq_diff():
-    #this function will update the text in the box that contains frequency, lenght and difference
+    #this function will update the text in the box that contains frequency, length and difference
     #you will do this by calculating all 3 and inserting the text when ever the button is pressed
     #when it is pressed you will also delete the current text that was in there, and put the new text in
     pass
