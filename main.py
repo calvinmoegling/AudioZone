@@ -60,7 +60,7 @@ waveform_button.pack(side="left", padx=10)
 intensity= Button(button_frame_middle, text="Intensity",command=lambda: intensityFunc(  ) ,bg="brown1", fg="black", width = 15)
 intensity.pack(side="left", padx=10)
                                                         # you will have to put stuff here v
-funkybttn= Button(button_frame_middle, text= "Get funky",command=lambda: funkyButtonFunc(   ), bg="dark orchid", fg= "snow", width = 15)
+funkybttn= Button(button_frame_middle, text= "Get funky",command=lambda: funkyButtonFunc(songList, root), bg="dark orchid", fg= "snow", width = 15)
 funkybttn.pack(side="left", padx=10)
 
 

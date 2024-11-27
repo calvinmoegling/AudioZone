@@ -6,7 +6,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from pydub import AudioSegment
 from tkinter import filedialog, messagebox
 import matplotlib.pyplot as plt
-
+from matplotlib.collections import LineCollection
 
 
 # Global variables to hold song data
@@ -178,7 +178,62 @@ def intensityFunc():
     # deletes the current_canvas
     # displays an intensity graph like shown in the video
     pass
-def funkyButtonFunc():
+def funkyButtonFunc(songList, root):
     #gets funky - this is the "add button and additional visual output for useful data (your choice)"
     #delete the current_canvas and replaces it with the funky one IDK change this name later
+    global current_canvas
+
+    if songList.size() == 0:
+        messagebox.showerror("Error", "No songs loaded!")
+        return
+
+    try:
+        # Get selected song
+        selected_song = songList.get(songList.curselection())
+        if not selected_song:
+            messagebox.showerror("Error", "No song selected!")
+            return
+
+        # Load audio
+        audio = AudioSegment.from_wav(selected_song)
+        samples = np.array(audio.get_array_of_samples())
+        sample_rate = audio.frame_rate
+
+        # Generate time array
+        duration = len(samples) / sample_rate
+        time = np.linspace(0, duration, num=len(samples))
+
+        # Create color gradients for the waveform
+        points = np.array([time, samples]).T.reshape(-1, 1, 2)
+        segments = np.concatenate([points[:-1], points[1:]], axis=1)
+
+        # Normalize the amplitude for better visuals
+        norm = plt.Normalize(samples.min(), samples.max())
+        cmap = plt.get_cmap("rainbow")  # Use a fun colormap!
+
+        # Create a colorful LineCollection
+        lc = LineCollection(segments, cmap=cmap, norm=norm)
+        lc.set_array(samples)  # Use the amplitude to set the colors
+        lc.set_linewidth(1.5)
+
+        # Plot the waveform
+        fig, ax = plt.subplots(figsize=(10, 4))
+        ax.add_collection(lc)
+        ax.set_xlim(time.min(), time.max())
+        ax.set_ylim(samples.min(), samples.max())
+        ax.set_title("Funky Colors!")
+        ax.set_xlabel("Time (s)")
+        ax.set_ylabel("Amplitude")
+
+        # Remove the previous canvas
+        if current_canvas:
+            current_canvas.get_tk_widget().destroy()
+
+        # Embed the plot into Tkinter
+        current_canvas = FigureCanvasTkAgg(fig, master=root)
+        current_canvas.draw()
+        current_canvas.get_tk_widget().pack(pady=20)
+
+    except Exception as e:
+        messagebox.showerror("Error", f"An error occurred: {str(e)}")
     pass
