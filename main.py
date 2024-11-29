@@ -31,7 +31,7 @@ info_box_frame = Frame(root)
 info_box_frame.pack(pady=10)
 
 # Define the info_box widget
-info_box = Text(info_box_frame, height=3, width=40, fg="black", font=("Arial", 12))
+info_box = Text(info_box_frame, height=3, width=50, fg="black", font=("Arial", 12))
 info_box.pack(side="left", pady=10)
 
 # Insert placeholder text into the info_box
