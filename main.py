@@ -1,7 +1,7 @@
 #main
 import os
 from tkinter import *
-from functions import load_music, show_waveform, clean, funkyButtonFunc, intensityFunc, update_len_freq_diff, alternateRTFunc, displayRTFunc, combineRTFunc
+from functions import load_music, show_waveform, clean, funkyButtonFunc, intensityFunc, alternateRTFunc, displayRTFunc, combineRTFunc
 
 root = Tk()
 
@@ -26,25 +26,22 @@ organise_menu.add_command(label='Select Folder',command=lambda: load_music(root,
 organise_menu.entryconfig("Select Folder", foreground="purple1")
 menubar.add_cascade(label='Load Music', menu=organise_menu)
 
-#top frame for info box
-button_frame_top = Frame(root)
-button_frame_top.pack(pady=10)
+# --- Info Box Frame ---
+info_box_frame = Frame(root)
+info_box_frame.pack(pady=10)
 
+# Define the info_box widget
+info_box = Text(info_box_frame, height=3, width=40, fg="black", font=("Arial", 12))
+info_box.pack(side="left", pady=10)
 
-info_box = Text(button_frame_top, height=3, width=45, fg="black", font=("Arial", 12))
-info_box.pack(side="left", pady=20)
+# Insert placeholder text into the info_box
+info_box.insert("1.0", "File Length:\n")
+info_box.insert("2.0", "Resonant Frequency:\n")
+info_box.insert("3.0", "Difference:\n")
 
-# Insert sample data into the Text widget
-file_length = "File Length:"
-frequency = "Resonant Frequency:"
-difference = "Difference:"
-
-#filler untill we update with graph data
-info_box.insert("1.0", file_length + "\n")  # Insert on the first line
-info_box.insert("2.0", frequency + "\n")   # Insert on the second line
-info_box.insert("3.0", difference + "\n")  # Insert on the third line
-#makes read only
+# Make the info_box read-only
 info_box.config(state="disabled")
+
 #middle frame for buttons
 button_frame_middle = Frame(root)
 button_frame_middle.pack(pady=10)
@@ -54,13 +51,13 @@ clean_button = Button(button_frame_middle, text="Clean Waveform", command=lambda
 clean_button.pack(side="left", padx=10)
 
 
-waveform_button = Button(button_frame_middle, text="Show Waveform", command=lambda: show_waveform(songList, root),bg="deepskyblue2", fg="black", width = 15)
+waveform_button = Button(button_frame_middle, text="Show Waveform", command=lambda: show_waveform(songList, root, info_box),bg="deepskyblue2", fg="black", width = 15)
 waveform_button.pack(side="left", padx=10)
                                                      #you will have to put stuff here v
 intensity= Button(button_frame_middle, text="Intensity",command=lambda: intensityFunc(  ) ,bg="brown1", fg="black", width = 15)
 intensity.pack(side="left", padx=10)
-                                                        # you will have to put stuff here v
-funkybttn= Button(button_frame_middle, text= "Get funky",command=lambda: funkyButtonFunc(   ), bg="dark orchid", fg= "snow", width = 15)
+
+funkybttn= Button(button_frame_middle, text= "Get funky",command=lambda: funkyButtonFunc(songList, root), bg="dark orchid", fg= "snow", width = 15)
 funkybttn.pack(side="left", padx=10)
 
 
