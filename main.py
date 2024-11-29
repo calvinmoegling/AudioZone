@@ -54,13 +54,13 @@ clean_button = Button(button_frame_middle, text="Clean Waveform", command=lambda
 clean_button.pack(side="left", padx=10)
 
 
-waveform_button = Button(button_frame_middle, text="Show Waveform", command=lambda: show_waveform(songList, root),bg="deepskyblue2", fg="black", width = 15)
+waveform_button = Button(button_frame_middle, text="Show Waveform", command=lambda: show_waveform(songList, root, info_box),bg="deepskyblue2", fg="black", width = 15)
 waveform_button.pack(side="left", padx=10)
                                                      #you will have to put stuff here v
 intensity= Button(button_frame_middle, text="Intensity",command=lambda: intensityFunc(  ) ,bg="brown1", fg="black", width = 15)
 intensity.pack(side="left", padx=10)
                                                         # you will have to put stuff here v
-funkybttn= Button(button_frame_middle, text= "Get funky",command=lambda: funkyButtonFunc(   ), bg="dark orchid", fg= "snow", width = 15)
+funkybttn= Button(button_frame_middle, text= "Get funky",command=lambda: funkyButtonFunc(songList, root), bg="dark orchid", fg= "snow", width = 15)
 funkybttn.pack(side="left", padx=10)
 
 
