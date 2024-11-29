@@ -8,7 +8,6 @@ from tkinter import filedialog, messagebox
 import matplotlib.pyplot as plt
 from matplotlib.collections import LineCollection
 
-
 # Global variables to hold song data
 songs = []
 current_canvas = None
@@ -38,11 +37,6 @@ def load_music(root, songList):
         # If it's already a .wav, add it directly
         songList.insert("end", file_path )
 
-
-
-
-
-
 def convert_to_wav(song, directory):
     name, ext = os.path.splitext(song)
 
@@ -63,7 +57,7 @@ def convert_to_wav(song, directory):
             return None
 
 
-def show_waveform(songList, root):
+def show_waveform(songList, root, info_box):
     global current_canvas  # Refer to the global canvas variable
 
     if songList.size() == 0:
@@ -113,6 +107,7 @@ def show_waveform(songList, root):
 
     except Exception as e:
         messagebox.showerror("Error", f"An error occurred: {str(e)}")
+    update_len_freq_diff(songList,info_box)
 
 
 def clean(songList, root):
@@ -154,12 +149,53 @@ def clean(songList, root):
     except Exception as e:
         messagebox.showerror("Error", f"Failed to clean audio: {str(e)}")
 
+def update_len_freq_diff(songList, info_box):
+    """
+    Updates the info box with the length, dominant frequency,
+    and difference from a reference frequency for the selected song.
+    """
+    try:
+        # Ensure info_box exists
+        if not info_box.winfo_exists():
+            messagebox.showerror("Error", "The info_box widget no longer exists!")
+            return
 
-def update_len_freq_diff():
-    #this function will update the text in the box that contains frequency, length and difference
-    #you will do this by calculating all 3 and inserting the text when ever the button is pressed
-    #when it is pressed you will also delete the current text that was in there, and put the new text in
-    pass
+        # Ensure a song is selected
+        if songList.size() == 0:
+            messagebox.showerror("Error", "No songs loaded!")
+            return
+
+        selected_song = songList.get(songList.curselection())
+        if not selected_song:
+            messagebox.showerror("Error", "No song selected!")
+            return
+
+        # Load the audio file
+        audio = AudioSegment.from_file(selected_song)
+        duration = len(audio) / 1000  # Convert duration to seconds
+        samples = np.array(audio.get_array_of_samples())
+        sample_rate = audio.frame_rate
+
+        # Frequency analysis using FFT
+        fft_result = np.fft.fft(samples)
+        frequencies = np.fft.fftfreq(len(samples), d=1 / sample_rate)
+        magnitude = np.abs(fft_result)
+        dominant_index = np.argmax(magnitude)
+        dominant_frequency = abs(frequencies[dominant_index])
+
+        # Calculate the difference from the reference frequency (440 Hz)
+        difference = abs(dominant_frequency - 440)
+
+        # Safely update info_box with the results
+        info_box.config(state="normal")
+        info_box.delete("1.0", "end")
+        info_box.insert("1.0", f"File Length: {duration:.2f} seconds\n")
+        info_box.insert("2.0", f"Resonant Frequency: {dominant_frequency:.2f} Hz\n")
+        info_box.insert("3.0", f"Difference: {difference:.2f} Hz\n")
+        info_box.config(state="disabled")
+
+    except Exception as e:
+        messagebox.showerror("Error", f"Failed to update data: {e}")
 
 def displayRTFunc():
     #deletes the current_canvas
@@ -179,8 +215,7 @@ def intensityFunc():
     # displays an intensity graph like shown in the video
     pass
 def funkyButtonFunc(songList, root):
-    #gets funky - this is the "add button and additional visual output for useful data (your choice)"
-    #delete the current_canvas and replaces it with the funky one IDK change this name later
+    #gets funky - this is the "add button and additional visual output for useful data"
     global current_canvas
 
     if songList.size() == 0:
@@ -236,4 +271,3 @@ def funkyButtonFunc(songList, root):
 
     except Exception as e:
         messagebox.showerror("Error", f"An error occurred: {str(e)}")
-    pass
