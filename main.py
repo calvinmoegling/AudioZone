@@ -68,13 +68,13 @@ funkybttn.pack(side="left", padx=10)
 button_frame_bottom = Frame(root)
 button_frame_bottom.pack(pady=10)
                                                         # you will have to put stuff here v
-displayRT= Button(button_frame_bottom, text="Display RT60",command=lambda: displayRTFunc(   ),bg="plum3", fg="black", width = 15)
+displayRT= Button(button_frame_bottom, text="Display RT60",command=lambda: displayRTFunc(songList, root),bg="plum3", fg="black", width = 15)
 displayRT.pack(side="left", padx=10)
                                                             # you will have to put stuff here v
-alternateRT= Button(button_frame_bottom, text="Alternate RT60",command=lambda: combineRTFunc(   ),bg="plum2", fg="black", width = 15)
+alternateRT= Button(button_frame_bottom, text="Alternate RT60",command=lambda: alternateRTFunc(root),bg="plum2", fg="black", width = 15)
 alternateRT.pack(side="left", padx=10)
                                                         # you will have to put stuff here v
-combineRT= Button(button_frame_bottom, text="Combine RT60",command=lambda: combineRTFunc(    ),bg="plum1", fg="black", width = 15)
+combineRT= Button(button_frame_bottom, text="Combine RT60",command=lambda: combineRTFunc(root, songList),bg="plum1", fg="black", width = 15)
 combineRT.pack(side="left", padx=10)
 
 root.mainloop()
