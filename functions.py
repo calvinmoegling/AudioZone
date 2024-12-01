@@ -454,10 +454,63 @@ def combineRTFunc(root, songList):
     except Exception as e:
         messagebox.showerror("Error", f"An error occurred: {str(e)}")
 
-def intensityFunc():
-    # deletes the current_canvas
-    # displays an intensity graph like shown in the video
-    pass
+def intensityFunc(root, songList, nfft=1024, noverlap=512, freq_limit=20000):
+    global current_canvas  # To handle the canvas for embedding the figure
+
+    # Check if a song is loaded
+    if songList.size() == 0:
+        messagebox.showerror("Error", "No songs loaded!")
+        return
+
+    try:
+        # Get the selected song
+        selected_song = songList.get(songList.curselection())
+        if not selected_song:
+            messagebox.showerror("Error", "No song selected!")
+            return
+
+        # Read the audio data
+        sample_rate, data = wavfile.read(selected_song)
+
+        # If stereo, take just one channel
+        if len(data.shape) == 2:
+            data = data[:, 0]
+
+        # Compute the spectrogram
+        fig, ax = plt.subplots(figsize=(10, 4))
+        Pxx, freqs, bins, im = ax.specgram(
+            data,
+            NFFT=nfft,
+            Fs=sample_rate,
+            noverlap=noverlap,
+            cmap='YlOrBr',
+            scale='dB',
+            vmax=50,  # Maximum dB level for better visualization
+        )
+
+        # Limit the frequency range to freq_limit
+        if freq_limit is not None:
+            freq_indices = freqs <= freq_limit
+            Pxx = Pxx[freq_indices, :]
+            freqs = freqs[freq_indices]
+
+        # Plot formatting
+        ax.set_xlabel('Time [s]')
+        ax.set_ylabel('Frequency [Hz]')
+        ax.set_title(f'Frequency Graph of {selected_song}')
+        fig.colorbar(im, ax=ax, label='Intensity (dB)')
+
+        # Remove the previous canvas if it exists
+        if current_canvas:
+            current_canvas.get_tk_widget().destroy()
+
+        # Embed the new plot into the Tkinter window
+        current_canvas = FigureCanvasTkAgg(fig, master=root)
+        current_canvas.draw()
+        current_canvas.get_tk_widget().pack(pady=20)
+
+    except Exception as e:
+        messagebox.showerror("Error", f"An error occurred: {str(e)}")
 
 def funkyButtonFunc(songList, root):
     #gets funky - this is the "add button and additional visual output for useful data"
