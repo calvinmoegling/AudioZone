@@ -78,4 +78,3 @@ combineRT= Button(button_frame_bottom, text="Combine RT60",command=lambda: combi
 combineRT.pack(side="left", padx=10)
 
 root.mainloop()
-

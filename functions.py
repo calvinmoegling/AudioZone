@@ -1,5 +1,3 @@
-#functions
-
 import os
 import numpy as np
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -9,16 +7,16 @@ import matplotlib.pyplot as plt
 from matplotlib.collections import LineCollection
 from scipy.io import wavfile
 
+
 # Global variables to hold song data
 songs = []
 current_canvas = None
 
-#global variables for handling RT60 graphs
+
 fig_low = None
 fig_med = None
 fig_high = None
 current_graph = 0
-
 
 def load_music(root, songList):
     file_path = filedialog.askopenfilename(
@@ -44,11 +42,6 @@ def load_music(root, songList):
         # If it's already a .wav, add it directly
         songList.insert("end", file_path )
 
-
-
-
-
-
 def convert_to_wav(song, directory):
     name, ext = os.path.splitext(song)
 
@@ -69,7 +62,7 @@ def convert_to_wav(song, directory):
             return None
 
 
-def show_waveform(songList, root):
+def show_waveform(songList, root, info_box):
     global current_canvas  # Refer to the global canvas variable
 
     if songList.size() == 0:
@@ -114,12 +107,15 @@ def show_waveform(songList, root):
         current_canvas = FigureCanvasTkAgg(fig, master=root)  # A tk.DrawingArea.
         current_canvas.draw()
 
-
         # Place the canvas in the Tkinter window (inside a frame or pack it directly)
         current_canvas.get_tk_widget().pack(pady=20)
 
     except Exception as e:
         messagebox.showerror("Error", f"An error occurred: {str(e)}")
+    update_len_freq_diff(songList,info_box)
+
+
+
 
 
 def clean(songList, root):
@@ -139,8 +135,12 @@ def clean(songList, root):
         audio = AudioSegment.from_wav(selected)
 
         #if it has more than 1 channel, remove them and make it one channel
+        raw_data = np.array(audio.get_array_of_samples())
+
         if audio.channels > 1:
             audio = audio.set_channels(1)
+
+
 
         #allows us to access the cleaned file
         directory = os.path.dirname(selected)
@@ -161,12 +161,53 @@ def clean(songList, root):
     except Exception as e:
         messagebox.showerror("Error", f"Failed to clean audio: {str(e)}")
 
+def update_len_freq_diff(songList, info_box):
+    """
+    Updates the info box with the length, dominant frequency,
+    and difference from a reference frequency for the selected song.
+    """
+    try:
+        # Ensure info_box exists
+        if not info_box.winfo_exists():
+            messagebox.showerror("Error", "The info_box widget no longer exists!")
+            return
 
-def update_len_freq_diff():
-    #this function will update the text in the box that contains frequency, length and difference
-    #you will do this by calculating all 3 and inserting the text when ever the button is pressed
-    #when it is pressed you will also delete the current text that was in there, and put the new text in
-    pass
+        # Ensure a song is selected
+        if songList.size() == 0:
+            messagebox.showerror("Error", "No songs loaded!")
+            return
+
+        selected_song = songList.get(songList.curselection())
+        if not selected_song:
+            messagebox.showerror("Error", "No song selected!")
+            return
+
+        # Load the audio file
+        audio = AudioSegment.from_file(selected_song)
+        duration = len(audio) / 1000  # Convert duration to seconds
+        samples = np.array(audio.get_array_of_samples())
+        sample_rate = audio.frame_rate
+
+        # Frequency analysis using FFT
+        fft_result = np.fft.fft(samples)
+        frequencies = np.fft.fftfreq(len(samples), d=1 / sample_rate)
+        magnitude = np.abs(fft_result)
+        dominant_index = np.argmax(magnitude)
+        dominant_frequency = abs(frequencies[dominant_index])
+
+        # Calculate the difference from the reference frequency (440 Hz)
+        difference = abs(dominant_frequency - 440)
+
+        # Safely update info_box with the results
+        info_box.config(state="normal")
+        info_box.delete("1.0", "end")
+        info_box.insert("1.0", f"File Length: {duration:.2f} seconds\n")
+        info_box.insert("2.0", f"Resonant Frequency: {dominant_frequency:.2f} Hz\n")
+        info_box.insert("3.0", f"Difference: {difference:.2f} Hz\n")
+        info_box.config(state="disabled")
+
+    except Exception as e:
+        messagebox.showerror("Error", f"Failed to update data: {e}")
 
 def find_target_frequency(freqs, freq_range):
     for x in freqs:
@@ -203,7 +244,7 @@ def displayRTFunc(songList, root):
         selected_song = songList.get(songList.curselection())
 
         sample_rate, data = wavfile.read(selected_song)
-        data_to_display = data[:, 0]
+        data_to_display = data if len(data.shape) == 1 else data[:, 0]
         spectrum, freqs, t, im = plt.specgram(data_to_display, NFFT=3120, Fs=sample_rate, cmap=plt.get_cmap('autumn_r'))
 
         # gets the data of the low frequency range
@@ -244,7 +285,7 @@ def displayRTFunc(songList, root):
         rt20 = (t[index_of_max_less_5] - t[index_of_max_less_25])[0]
 
         plt.grid()
-        plt.show()
+
 
         # gets the data of the med frequency range
         data_in_db = frequency_check(freqs, spectrum, 1000)
@@ -284,7 +325,7 @@ def displayRTFunc(songList, root):
         rt20 = (t[index_of_max_less_5] - t[index_of_max_less_25])[0]
 
         plt.grid()
-        plt.show()
+
 
 
         # gets the data of the high frequency range
@@ -325,7 +366,7 @@ def displayRTFunc(songList, root):
         rt20 = (t[index_of_max_less_5] - t[index_of_max_less_25])[0]
 
         plt.grid()
-        plt.show()
+
 
         drawGraph(root, fig_med)
         current_graph = 2
@@ -346,7 +387,7 @@ def drawGraph(root, figure_to_draw):
     # Place the canvas in the Tkinter window (inside a frame or pack it directly)
     current_canvas.get_tk_widget().pack(pady=20)
 
-    pass
+
 
 
 def alternateRTFunc(root):
@@ -388,7 +429,7 @@ def combineRTFunc(root, songList):
         selected_song = songList.get(songList.curselection())
 
         sample_rate, data = wavfile.read(selected_song)
-        data_to_display = data[:, 0]
+        data_to_display = data if len(data.shape) == 1 else data[:, 0]
         spectrum, freqs, t, im = plt.specgram(data_to_display, NFFT=3120, Fs=sample_rate, cmap=plt.get_cmap('autumn_r'))
 
         low_data_in_db = frequency_check(freqs, spectrum, 200)
@@ -405,7 +446,7 @@ def combineRTFunc(root, songList):
         ax_merged.set_ylabel('Power (dB)')
 
         plt.grid()
-        plt.show()
+
 
         drawGraph(root, fig_merged)
 
@@ -417,9 +458,9 @@ def intensityFunc():
     # deletes the current_canvas
     # displays an intensity graph like shown in the video
     pass
+
 def funkyButtonFunc(songList, root):
-    #gets funky - this is the "add button and additional visual output for useful data (your choice)"
-    #delete the current_canvas and replaces it with the funky one IDK change this name later
+    #gets funky - this is the "add button and additional visual output for useful data"
     global current_canvas
 
     if songList.size() == 0:
@@ -475,4 +516,3 @@ def funkyButtonFunc(songList, root):
 
     except Exception as e:
         messagebox.showerror("Error", f"An error occurred: {str(e)}")
-    pass
