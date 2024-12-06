@@ -285,6 +285,7 @@ def displayRTFunc(songList, root):
         rt20 = (t[index_of_max_less_5] - t[index_of_max_less_25])[0]
 
         plt.grid()
+        plt.close()
 
 
         # gets the data of the med frequency range
@@ -325,7 +326,7 @@ def displayRTFunc(songList, root):
         rt20 = (t[index_of_max_less_5] - t[index_of_max_less_25])[0]
 
         plt.grid()
-
+        plt.close()
 
 
         # gets the data of the high frequency range
@@ -338,9 +339,6 @@ def displayRTFunc(songList, root):
         ax_high.set_xlabel('Time (s)')
         ax_high.set_ylabel('Power (dB)')
 
-        # Embed the figure into Tkinter window
-        current_canvas = FigureCanvasTkAgg(fig_high, master=root)  # A tk.DrawingArea.
-        current_canvas.draw()
 
         index_of_max = np.argmax(data_in_db)
 
@@ -366,6 +364,7 @@ def displayRTFunc(songList, root):
         rt20 = (t[index_of_max_less_5] - t[index_of_max_less_25])[0]
 
         plt.grid()
+        plt.close()
 
 
         drawGraph(root, fig_med)
@@ -395,6 +394,10 @@ def alternateRTFunc(root):
     global fig_low
     global fig_med
     global fig_high
+
+    print(fig_low)
+    print(fig_med)
+    print(fig_high)
 
     try:
         if current_graph == 0:
@@ -430,23 +433,23 @@ def combineRTFunc(root, songList):
 
         sample_rate, data = wavfile.read(selected_song)
         data_to_display = data if len(data.shape) == 1 else data[:, 0]
-        spectrum, freqs, t, im = plt.specgram(data_to_display, NFFT=3120, Fs=sample_rate, cmap=plt.get_cmap('autumn_r'))
+        spectrum_, freqs_, t_, im_ = plt.specgram(data_to_display, NFFT=3120, Fs=sample_rate, cmap=plt.get_cmap('autumn_r'))
 
-        low_data_in_db = frequency_check(freqs, spectrum, 200)
-        med_data_in_db = frequency_check(freqs, spectrum, 1000)
-        high_data_in_db = frequency_check(freqs, spectrum, 10000)
+        low_data_in_db = frequency_check(freqs_, spectrum_, 200)
+        med_data_in_db = frequency_check(freqs_, spectrum_, 1000)
+        high_data_in_db = frequency_check(freqs_, spectrum_, 10000)
 
 
         fig_merged, ax_merged = plt.subplots(figsize=(10, 4))
-        ax_merged.plot(t, low_data_in_db, linewidth=1, alpha=0.7, color='#9700ff')
-        ax_merged.plot(t, med_data_in_db, linewidth=1, alpha=0.7, color='#0000ff')
-        ax_merged.plot(t, high_data_in_db, linewidth=1, alpha=0.7, color='#0087ff')
+        ax_merged.plot(t_, low_data_in_db, linewidth=1, alpha=0.7, color='#9700ff')
+        ax_merged.plot(t_, med_data_in_db, linewidth=1, alpha=0.7, color='#0000ff')
+        ax_merged.plot(t_, high_data_in_db, linewidth=1, alpha=0.7, color='#0087ff')
         ax_merged.set_title(f"Rt60 of {selected_song} (Merged)")
         ax_merged.set_xlabel('Time (s)')
         ax_merged.set_ylabel('Power (dB)')
 
         plt.grid()
-
+        plt.close()
 
         drawGraph(root, fig_merged)
 
